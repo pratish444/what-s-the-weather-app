@@ -1,74 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#71C5EC"
+    tools:context=".MainActivity">
 
-    <!-- Background Image -->
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/backgroundpic"
         android:scaleType="centerCrop"
-        android:src="@drawable/backgroundpic"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:adjustViewBounds="true" />
 
-    <!-- Enter a city text -->
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter a City..."
-        android:textSize="40sp"
-        android:textColor="@android:color/background_light"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="50dp"
-        app:layout_constraintHorizontal_bias="0.5" />
-
-    <!-- Input field for city name -->
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:hint="City Name"
-        android:inputType="textPersonName"
-        android:minHeight="48dp"
-        android:textColor="@android:color/background_light"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <!-- Button to get weather -->
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="What's the weather"
-        android:textColorHighlight="@color/black"
+        android:text="Weather App"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp"
         android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/editText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
-        android:onClick="getWeather" />
+        android:textSize="52dp"
+        android:textFontWeight="500"
+        android:textStyle="bold" />
 
-    <!-- TextView for displaying weather result -->
-    <TextView
-        android:id="@+id/resultTextView"
+    <EditText
+        android:id="@+id/cityName"
+        android:layout_width="270dp"
+        android:layout_height="72dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="120dp"
+        android:background="#E18DA9"
+        android:hint="Enter City"
+        android:textColorHint="@color/white"
+        android:textColor="@color/white"
+        android:textSize="36dp"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textColor="@android:color/background_light"
-        app:layout_constraintTop_toBottomOf="@+id/button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="30dp" />
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="200dp"
+        android:layout_marginRight="9dp"
+        android:text="Search"
+        android:textSize="20dp"
+        android:background="#6D30D8" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/weather"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="#E18DA9"
+        android:text="@string/weather_details"
+        android:textColor="#006064"
+        android:textFontWeight="500"
+        android:textSize="30dp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

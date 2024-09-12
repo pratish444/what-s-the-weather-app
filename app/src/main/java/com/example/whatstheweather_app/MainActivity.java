@@ -1,111 +1,105 @@
 package com.example.whatstheweather_app;
 
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.*;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import org.json.JSONObject;
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
+    TextView cityName;
+    Button search;
+    TextView show;
+    String url;
 
-    EditText cityName;
-    TextView weatherResult;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        cityName = findViewById(R.id.editText);
-        weatherResult = findViewById(R.id.resultTextView);
-        Button getWeatherButton = findViewById(R.id.button);
-
-        getWeatherButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String city = cityName.getText().toString();
-                if (!city.isEmpty()) {
-                    getWeatherData(city);
-                } else {
-                    weatherResult.setText("Please enter a city name");
-                }
-            }
-        });
-    }
-
-    public void getWeatherData(String city) {
-        try {
-            // Encode the city name to handle spaces and special characters
-            String encodedCityName = URLEncoder.encode(city, "UTF-8");
-            DownloadTask task = new DownloadTask();
-            task.execute("https://api.openweathermap.org/data/2.5/weather?q=" + encodedCityName + "&appid=YOUR_API_KEY&units=metric");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public class DownloadTask extends AsyncTask<String, Void, String> {
-
+    class getWeather extends AsyncTask<String, Void, String>{
         @Override
-        protected String doInBackground(String... urls) {
-            String result = "";
-            URL url;
-            HttpURLConnection urlConnection = null;
+        protected String doInBackground(String... urls){
+            StringBuilder result = new StringBuilder();
+            try{
+                URL url= new URL(urls[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.connect();
 
-            try {
-                url = new URL(urls[0]);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                InputStream in = urlConnection.getInputStream();
-                InputStreamReader reader = new InputStreamReader(in);
-                int data = reader.read();
-                while (data != -1) {
-                    char current = (char) data;
-                    result += current;
-                    data = reader.read();
+                InputStream inputStream = urlConnection.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line="";
+                while((line = reader.readLine()) != null){
+                    result.append(line).append("\n");
                 }
-                return result;
-            } catch (Exception e) {
+                return result.toString();
+            }catch(Exception e){
                 e.printStackTrace();
                 return null;
             }
         }
-
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-
-            if (s == null || s.isEmpty()) {
-                weatherResult.setText("Error retrieving weather data");
-                return;
-            }
-
-            try {
-                JSONObject jsonObject = new JSONObject(s);
-
-                // Parsing temperature and weather description
-                JSONObject main = jsonObject.getJSONObject("main");
-                double temperature = main.getDouble("temp");
-
-                JSONObject weatherPart = jsonObject.getJSONArray("weather").getJSONObject(0);
-                String description = weatherPart.getString("description");
-
-                String weatherInfo = "Temperature: " + temperature + "°C\n" + "Description: " + description;
-                weatherResult.setText(weatherInfo);
-
-            } catch (Exception e) {
+        protected void onPostExecute(String result){
+            super.onPostExecute(result);
+            try{
+                JSONObject jsonObject = new JSONObject(result);
+                String weatherInfo = jsonObject.getString("main");
+                weatherInfo = weatherInfo.replace("temp","Temperature");
+                weatherInfo = weatherInfo.replace("feels_like","Feels Like");
+                weatherInfo = weatherInfo.replace("temp_max","Temperature Max");
+                weatherInfo = weatherInfo.replace("temp_min","Temperature Min");
+                weatherInfo = weatherInfo.replace("pressure","Pressure");
+                weatherInfo = weatherInfo.replace("humidity","Humidity");
+                weatherInfo = weatherInfo.replace("{","");
+                weatherInfo = weatherInfo.replace("}","");
+                weatherInfo = weatherInfo.replace(",","\n");
+                weatherInfo = weatherInfo.replace(":"," : ");
+                show.setText(weatherInfo);
+            }catch(Exception e){
                 e.printStackTrace();
-                weatherResult.setText("Error parsing weather data");
             }
         }
+    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        cityName = findViewById(R.id.cityName);
+        search = findViewById(R.id.search);
+        show = findViewById(R.id.weather);
+
+        final String[] temp={""};
+
+        search.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Toast.makeText(MainActivity.this, "Button Clicked! ", Toast.LENGTH_SHORT).show();
+                String city = cityName.getText().toString();
+                try{
+                    if(city!=null){
+                        url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=5b9b4bb96f84b676a7ef297fe655d74b";
+                    }else{
+                        Toast.makeText(MainActivity.this, "Enter City", Toast.LENGTH_SHORT).show();
+                    }
+                    getWeather task= new getWeather();
+                    temp[0] = task.execute(url).get();
+                }catch(ExecutionException e){
+                    e.printStackTrace();
+                }catch(InterruptedException e){
+                    e.printStackTrace();
+                }
+                if(temp[0] == null){
+                    show.setText("Cannot able to find Weather");
+                }
+
+            }
+        });
+
     }
 }
